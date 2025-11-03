@@ -39,3 +39,68 @@ def extract_markdown_links(text):
     pattern = r'\[([^\]]*)\]\(([^)]+)\)'
     matches = re.findall(pattern, text)
     return matches
+
+
+
+# will behave similar to split_nodes_delimiter but for images
+def split_nodes_image(old_nodes):
+    
+    new_nodes = []
+    
+    for node in old_nodes:
+         if node.node_type != TextType.TEXT:
+                new_nodes.append(node)
+         else:
+                # extract markdown images from the text
+                matches = extract_markdown_images(node.text)
+                
+                if not matches:
+                    new_nodes.append(node)
+                else:
+                    # split the text by the image markdown
+                    parts = re.split(r'!\[[^\]]*\]\([^)]+\)', node.text)
+                    
+                    for i in range(len(parts)):
+                        # add the text part
+                        if parts[i]:
+                            new_nodes.append(TextNode(parts[i], TextType.TEXT))
+                        
+                        # add the image part if exists
+                        if i < len(matches):
+                            alt_text, url = matches[i]
+                            image_node = TextNode(alt_text, TextType.IMAGE)
+                            image_node.url = url
+                            new_nodes.append(image_node)
+    return new_nodes
+    
+    
+    
+def split_nodes_link(old_nodes):
+    
+    new_nodes = []
+    
+    for node in old_nodes:
+         if node.node_type != TextType.TEXT:
+                new_nodes.append(node)
+         else:
+                # extract markdown links from the text
+                matches = extract_markdown_links(node.text)
+                
+                if not matches:
+                    new_nodes.append(node)
+                else:
+                    # split the text by the link markdown
+                    parts = re.split(r'\[[^\]]*\]\([^)]+\)', node.text)
+                    
+                    for i in range(len(parts)):
+                        # add the text part
+                        if parts[i]:
+                            new_nodes.append(TextNode(parts[i], TextType.TEXT))
+                        
+                        # add the link part if exists
+                        if i < len(matches):
+                            link_text, url = matches[i]
+                            link_node = TextNode(link_text, TextType.LINK)
+                            link_node.url = url
+                            new_nodes.append(link_node)
+    return new_nodes
