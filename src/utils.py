@@ -104,3 +104,19 @@ def split_nodes_link(old_nodes):
                             link_node.url = url
                             new_nodes.append(link_node)
     return new_nodes
+
+
+def text_to_textnodes(text):
+    # Start with a single TEXT node
+    nodes = [TextNode(text, TextType.TEXT)]
+    # Split for bold
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    # Split for italic
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    # Split for code
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    # Split for images
+    nodes = split_nodes_image(nodes)
+    # Split for links
+    nodes = split_nodes_link(nodes)
+    return nodes
