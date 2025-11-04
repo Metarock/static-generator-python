@@ -1,6 +1,6 @@
 import unittest
 
-from blocknode import markdown_to_blocks
+from blocknode import BlockNode
 
 
 class TestUtils(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestUtils(unittest.TestCase):
                 - This is a list
                 - with items
                 """
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(
             blocks,
             [
@@ -26,7 +26,7 @@ class TestUtils(unittest.TestCase):
 
     def test_markdown_to_blocks_single_paragraph(self):
         md = "This is a single paragraph."
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["This is a single paragraph."])
 
     def test_markdown_to_blocks_multiple_paragraphs(self):
@@ -37,7 +37,7 @@ class TestUtils(unittest.TestCase):
 
         Third paragraph.
         """
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["First paragraph.", "Second paragraph.", "Third paragraph."])
 
     def test_markdown_to_blocks_with_headings(self):
@@ -50,7 +50,7 @@ class TestUtils(unittest.TestCase):
 
         More text.
         """
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["# Heading 1", "Some text under heading.", "## Heading 2", "More text."])
 
     def test_markdown_to_blocks_with_lists(self):
@@ -61,7 +61,7 @@ class TestUtils(unittest.TestCase):
         1. Ordered item 1
         2. Ordered item 2
         """
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["- Item 1\n- Item 2", "1. Ordered item 1\n2. Ordered item 2"])
 
     def test_markdown_to_blocks_with_code_block(self):
@@ -72,17 +72,17 @@ class TestUtils(unittest.TestCase):
 
         Normal text.
         """
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["```\ncode block\n```", "Normal text."])
 
     def test_markdown_to_blocks_empty_markdown(self):
         md = ""
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, [])
 
     def test_markdown_to_blocks_only_empty_lines(self):
         md = "\n\n\n"
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, [])
 
     def test_markdown_to_blocks_leading_trailing_whitespace(self):
@@ -91,7 +91,7 @@ class TestUtils(unittest.TestCase):
 
         Another paragraph.
         """
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["Paragraph with leading spaces.", "Another paragraph."])
 
     def test_markdown_to_blocks_mixed_content(self):
@@ -107,12 +107,12 @@ class TestUtils(unittest.TestCase):
         code
         ```
         """
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["# Title", "Some paragraph text.", "- List item 1\n- List item 2", "```\ncode\n```"])
 
     def test_markdown_to_blocks_no_empty_lines(self):
         md = "Line 1\nLine 2\nLine 3"
-        blocks = markdown_to_blocks(md)
+        blocks = BlockNode.markdown_to_blocks(md)
         self.assertEqual(blocks, ["Line 1\nLine 2\nLine 3"])
 
 if __name__ == "__main__":
