@@ -1,4 +1,14 @@
+import re
 
+from enum import Enum
+
+class BlockType(Enum):
+    PARAGRAPH = "paragraph"
+    HEADING = "heading"
+    CODE = "code"
+    QUOTE = "quote"
+    UNORDERED_LIST = "unordered_list"
+    ORDERED_LIST = "ordered_list"
 
 class BlockNode:
     def __init__(self, content):
@@ -29,3 +39,26 @@ class BlockNode:
             blocks.append("\n".join(current_block).strip())
 
         return blocks
+    
+    # takes a single block of markdown text as input and returns the BlockType representing its type.
+    # assume all leading and trailing whitespace has been removed.
+    def block_to_block_type(markdown):
+        # headings start with 1-6 # followed by a space and heading text
+        if re.match(r'^(#{1,6})\s', markdown):
+            return BlockType.HEADING
+        # codeblocks must start with 3 backticks and end with 3 backticks.
+        if re.match(r'^```', markdown) and re.search(r'```$', markdown):
+            return BlockType.CODE
+        # every line in a quote block start with >
+        if all(re.match(r'^>\s', line) for line in markdown.split("\n")):
+            return BlockType.QUOTE
+        
+        # every line an unordered list block must start with a - character, followed by a space
+        if all(re.match(r'^-\s', line) for line in markdown.split("\n")):
+            return BlockType.UNORDERED_LIST
+
+        # every line in an ordered list block must start with a number followed by a period and a space
+        if all(re.match(r'^\d+\.\s', line) for line in markdown.split("\n")):
+            return BlockType.ORDERED_LIST
+
+        return BlockType.PARAGRAPH
