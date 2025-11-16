@@ -1,6 +1,8 @@
 import re
 
+from htmlnode import LeafNode, ParentNode, text_node_to_html_node
 from textnode import TextNode, TextType
+from blocknode import BlockNode, BlockType
 
     
 
@@ -132,3 +134,99 @@ def text_to_textnodes(text):
     # Split for links
     nodes = split_nodes_link(nodes)
     return nodes
+
+def block_to_html_heading(block):
+        level = 0
+        for char in block:
+            if char == '#':
+                level += 1
+            else:
+                break
+        # only up to heading 6
+        if level > 6:
+            level = 6
+        tag = f'h{level}'
+        content = block[level:].strip()
+        text_nodes = text_to_textnodes(content)
+        html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+        return ParentNode(tag, html_nodes)
+
+
+def block_to_html_code(block):
+    content = block.strip('```').strip()
+    return ParentNode("pre", [LeafNode("code", content)])
+
+def block_to_html_quote(block):
+    lines = block.split('\n')
+    content = '\n'.join(line.lstrip('> ').rstrip() for line in lines)
+    text_nodes = text_to_textnodes(content)
+    html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+    return ParentNode("blockquote", html_nodes)
+
+def block_to_html_unordered_list(block):
+        lines = block.split('\n')
+        list_items = []
+        for line in lines:
+            content = line.lstrip('- ').rstrip()
+            text_nodes = text_to_textnodes(content)
+            html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+            list_items.append(ParentNode("li", html_nodes))
+        return ParentNode("ul", list_items)
+
+def block_to_html_ordered_list(block):
+        lines = block.split('\n')
+        list_items = []
+        for line in lines:
+            content = re.sub(r'^\d+\.\s', '', line).rstrip()
+            text_nodes = text_to_textnodes(content)
+            html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+            list_items.append(ParentNode("li", html_nodes))
+        return ParentNode("ol", list_items)
+
+def block_to_html_paragraph(block):
+        text_nodes = text_to_textnodes(block)
+        html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+        return ParentNode("p", html_nodes)
+
+def markdown_to_html_node(markdown):
+    blocks = BlockNode.markdown_to_blocks(markdown)
+    html_nodes = []
+    
+    for block in blocks:
+        block_type = BlockNode.block_to_block_type(block)
+        if block_type == BlockType.PARAGRAPH:
+            html_nodes.append(block_to_html_paragraph(block))
+        elif block_type == BlockType.HEADING:
+            html_nodes.append(block_to_html_heading(block))
+        elif block_type == BlockType.CODE:
+            html_nodes.append(block_to_html_code(block))
+        elif block_type == BlockType.QUOTE:
+            html_nodes.append(block_to_html_quote(block))
+        elif block_type == BlockType.UNORDERED_LIST:
+            html_nodes.append(block_to_html_unordered_list(block))
+        elif block_type == BlockType.ORDERED_LIST:
+            html_nodes.append(block_to_html_ordered_list(block))
+    return ParentNode("div", html_nodes)
+            
+    
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    
+    # read markdown file from from_path
+    # 'r' means read mode
+    with open(from_path, 'r') as file:
+        markdown_content = file.read()
+    
+    
+    with open(template_path, 'r') as file:
+        template_content = file.read()
+    
+    title = extract_title(markdown_content)
+    
+    html_content = markdown_to_html_node(markdown_content).to_html()
+    
+    final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
+    
+    with open(dest_path, 'w') as file:
+        file.write(final_html)
