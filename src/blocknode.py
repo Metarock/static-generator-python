@@ -42,23 +42,28 @@ class BlockNode:
     
     # takes a single block of markdown text as input and returns the BlockType representing its type.
     # assume all leading and trailing whitespace has been removed.
-    def block_to_block_type(markdown):
-        # headings start with 1-6 # followed by a space and heading text
-        if re.match(r'^(#{1,6})\s', markdown):
+    def block_to_block_type(block):
+        lines = block.split("\n")
+
+        if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
             return BlockType.HEADING
-        # codeblocks must start with 3 backticks and end with 3 backticks.
-        if re.match(r'^```', markdown) and re.search(r'```$', markdown):
+        if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
             return BlockType.CODE
-        # every line in a quote block start with >
-        if all(re.match(r'^>\s', line) for line in markdown.split("\n")):
+        if block.startswith(">"):
+            for line in lines:
+                if not line.startswith(">"):
+                    return BlockType.PARAGRAPH
             return BlockType.QUOTE
-        
-        # every line an unordered list block must start with a - character, followed by a space
-        if all(re.match(r'^-\s', line) for line in markdown.split("\n")):
+        if block.startswith("- "):
+            for line in lines:
+                if not line.startswith("- "):
+                    return BlockType.PARAGRAPH
             return BlockType.UNORDERED_LIST
-
-        # every line in an ordered list block must start with a number followed by a period and a space
-        if all(re.match(r'^\d+\.\s', line) for line in markdown.split("\n")):
+        if block.startswith("1. "):
+            i = 1
+            for line in lines:
+                if not line.startswith(f"{i}. "):
+                    return BlockType.PARAGRAPH
+                i += 1
             return BlockType.ORDERED_LIST
-
         return BlockType.PARAGRAPH
