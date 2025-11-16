@@ -1,11 +1,14 @@
 print("hello world")
 from textnode import TextNode, TextType
-
+from helpers import copy_static_to_public
 
 def main():
     # create a TextNode with dummy values and print it
     node = TextNode("Example text", TextType.TEXT)
-    print(node)
+    # COMMENT OUT FOR NOW
+    # print(node)
+    # call the function to copy static to public
+    copy_static_to_public()
     
 if __name__ == "__main__":
     main()
