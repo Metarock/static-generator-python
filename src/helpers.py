@@ -1,10 +1,7 @@
 import os
 import shutil
 
-# TO DO: create a recursive function to copy all contents
-# from static directory to public directory
-
-# 1. It should first delete all the contents of the destination directory (public) to ensure that the copy is clean.
+# It deletes all the contents of the destination directory (public) to ensure that the copy is clean.
 def delete_all_contents(directory):
     if os.path.exists(directory):
         for item in os.listdir(directory):
@@ -13,7 +10,9 @@ def delete_all_contents(directory):
                 shutil.rmtree(item_path)
             else:
                 os.remove(item_path)
-# 2. It should copy all files and subdirectories, nested files, etc.
+
+
+# It copies files and subdirectories, nested files, etc.
 def copy_contents(src, dest):
     if not os.path.exists(dest):
         os.makedirs(dest)
@@ -26,12 +25,10 @@ def copy_contents(src, dest):
             shutil.copy2(src_item, dest_item)
             print(f"Copied {src_item} to {dest_item}")
     
-# 3. I recommend logging the path of each file you copy, so you can see what's happening as you run and debug your code.
 
 def copy_static_to_public(static_dir='static', public_dir='public'):
     delete_all_contents(public_dir)
     copy_contents(static_dir, public_dir)
     
     print(f"Copied contents from {static_dir} to {public_dir}")
-    
     

@@ -1,6 +1,6 @@
 import unittest
 
-from utils import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
+from utils import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes, extract_title
 from textnode import TextNode, TextType
 
 
@@ -315,6 +315,11 @@ class TestUtils(unittest.TestCase):
             expected_link,
         ]
         self.assertEqual(nodes, expected)
+        
+    def test_extract_title(self):
+        text = "# This is the Title\n\nThis is the body text."
+        title = extract_title(text)
+        self.assertEqual(title, "This is the Title")
 
 if __name__ == "__main__":
     unittest.main()

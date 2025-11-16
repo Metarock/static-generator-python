@@ -2,6 +2,18 @@ import re
 
 from textnode import TextNode, TextType
 
+    
+
+def extract_title(markdown):
+    # It should pull the h1 header from the markdown file (the line that starts with a single #) and return it.
+    #If there is no h1 header, raise an exception.
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:].strip()
+    raise ValueError("No h1 header found in markdown")
+
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     
     new_nodes = []
