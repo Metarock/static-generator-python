@@ -1,7 +1,6 @@
 import re
 
 from enum import Enum
-from htmlnode import ParentNode, text_node_to_html_node, LeafNode
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
     HEADING = "heading"
