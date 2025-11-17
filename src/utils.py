@@ -188,6 +188,9 @@ def generate_page(from_path, template_path, dest_path):
     title = extract_title(markdown_content)
     html_content = markdown_to_html_node(markdown_content).to_html()
     final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
+
+    final_html = re.sub(r'href="/', f'href="{os.path.dirname(dest_path)}/', html)
+    final_html = re.sub(r'src="/', f'src="{os.path.dirname(dest_path)}/', final_html)
     
     with open(dest_path, 'w') as file:
         file.write(final_html)
