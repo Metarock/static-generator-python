@@ -12,10 +12,10 @@ def main():
         basepath = "/"
     
     # call the function to copy static to public
-    copy_static_to_public()
+    copy_static_to_public(public_dir='docs')
     # template.html is in root project
     # pass basepath 
-    generate_pages_recursive("content", "template.html", "public", basepath)
+    generate_pages_recursive("content", "template.html", "docs", basepath)
     
 if __name__ == "__main__":
     main()
