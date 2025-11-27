@@ -176,7 +176,7 @@ def markdown_to_html_node(markdown):
         children.append(html_node)
     return ParentNode("div", children, None)
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     
     with open(from_path, 'r') as file:
@@ -189,14 +189,14 @@ def generate_page(from_path, template_path, dest_path):
     html_content = markdown_to_html_node(markdown_content).to_html()
     final_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html_content)
 
-    final_html = re.sub(r'href="/', f'href="{os.path.dirname(dest_path)}/', html)
-    final_html = re.sub(r'src="/', f'src="{os.path.dirname(dest_path)}/', final_html)
+    final_html = final_html.replace('href="/', f'href="{basepath}')
+    final_html = final_html.replace('src="/', f'src="{basepath}')
     
     with open(dest_path, 'w') as file:
         file.write(final_html)
         
 
-def generate_pages_recursive(dir_path_content, template_path, dir_path_dest):
+def generate_pages_recursive(dir_path_content, template_path, dir_path_dest, basepath):
     # crawl every entry in the content directory
     for entry in os.listdir(dir_path_content):
         src_entry_path = os.path.join(dir_path_content, entry)
@@ -205,8 +205,8 @@ def generate_pages_recursive(dir_path_content, template_path, dir_path_dest):
         if os.path.isdir(src_entry_path):
             if not os.path.exists(dest_entry_path):
                 os.makedirs(dest_entry_path)
-            generate_pages_recursive(src_entry_path, template_path, dest_entry_path)
+            generate_pages_recursive(src_entry_path, template_path, dest_entry_path, basepath)
         elif entry.endswith('.md'):
             file_name = dest_entry_path[:-3]
             dest_html_path = file_name + '.html'
-            generate_page(src_entry_path, template_path, dest_html_path)        
+            generate_page(src_entry_path, template_path, dest_html_path, basepath)        
